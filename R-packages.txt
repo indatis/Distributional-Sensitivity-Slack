@@ -1,0 +1,10 @@
+# R packages used by paper_results.R
+# Install in R with:
+# install.packages(c("readr", "dplyr", "ggplot2", "stringr", "knitr", "patchwork"))
+
+readr
+dplyr
+ggplot2
+stringr
+knitr
+patchwork
