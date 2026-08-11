@@ -12,7 +12,7 @@ This repository contains the reproducible code for the **Monte Carlo simulation 
 - `paper_results.R` — reads the Python simulation outputs and produces the main simulation table/figure outputs used in the manuscript.
 - `requirements.txt` — Python dependencies.
 - `R-packages.txt` — R packages required for `paper_results.R`.
-- `results/` — output directory created/used by the scripts.
+
 
 The exploratory notebook used during development is intentionally not required for reproduction of the reported results.
 
