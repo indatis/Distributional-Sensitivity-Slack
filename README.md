@@ -10,7 +10,7 @@ This repository contains code for the revised Monte Carlo experiments, simulatio
 
 - `simulation.py` — main paired Monte Carlo simulation, including the BACI-calibrated lognormal regime and descriptive directional comparisons.
 - `paper_results.R` — produces manuscript-facing tables and figures from the Python simulation outputs.
-- `b5_topology_robustness.py` — B5 robustness check with heterogeneous target degrees (Zipf exponent `gamma = 3.5`).
+- `topology_robustness.py` — B5 robustness check with heterogeneous target degrees (Zipf exponent `gamma = 3.5`).
 - `sensitivity_check.py` — sensitivity check for replication counts and random seeds.
 - `BACI_slack_empirical_analysis.ipynb` — Google Colab notebook for the empirical BACI analysis, tail diagnostics, and lognormal calibration.
 - `requirements.txt` — Python dependencies.
@@ -105,7 +105,7 @@ This separate experiment uses `(M,N) = (100,100)` and `theta = 0.7`. It compares
 Run the main simulation first to produce the Erdős–Rényi baseline summary, then run:
 
 ```bash
-python b5_topology_robustness.py --rev1-results-dir results_REV1
+python topology_robustness.py --rev1-results-dir results_REV1
 ```
 
 The default output directory is `B5_topology_robustness/`. Main outputs include `B5_table_original_request.csv`, `B5_table_with_lognormal.csv`, `B5_topology_diagnostics.csv`, and replication-level results. Without the main simulation summary, the script still computes the heterogeneous-topology results but cannot include the Erdős–Rényi baseline row in its comparison table.
