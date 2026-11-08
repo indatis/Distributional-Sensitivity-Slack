@@ -1,8 +1,14 @@
-# Python dependencies for the Monte Carlo simulation
+# Python dependencies for the Slack Monte Carlo simulations
+# and BACI empirical analysis
 # Tested with Python 3.12.12
 
+# Main simulation and robustness checks
 numpy>=1.26,<3
 pandas>=2.2,<3
 scipy>=1.12,<2
 matplotlib>=3.8,<4
 seaborn>=0.13,<1
+
+# BACI empirical analysis notebook
+powerlaw
+tabulate
