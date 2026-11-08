@@ -4,106 +4,140 @@ Code accompanying the manuscript:
 
 **Distributional Sensitivity of Slack-Based Fragility Measures in Weighted Bipartite Networks**
 
-This repository contains the reproducible code for the **Monte Carlo simulation study** and the associated simulation tables and figures.
+This repository contains code for the revised Monte Carlo experiments, simulation tables and figures, two robustness checks, and the empirical BACI 2023 analysis.
 
 ## Repository contents
 
-- `simulation.py` — runs the paired Monte Carlo simulation and directional Monte Carlo comparisons.
-- `paper_results.R` — reads the Python simulation outputs and produces the main simulation table/figure outputs used in the manuscript.
+- `simulation.py` — main paired Monte Carlo simulation, including the BACI-calibrated lognormal regime and descriptive directional comparisons.
+- `paper_results.R` — produces manuscript-facing tables and figures from the Python simulation outputs.
+- `b5_topology_robustness.py` — B5 robustness check with heterogeneous target degrees (Zipf exponent `gamma = 3.5`).
+- `check_R3_C5_sensitivity.py` — sensitivity check for replication counts and random seeds.
+- `BACI_slack_empirical_analysis_GitHub_clean.ipynb` — Google Colab notebook for the empirical BACI analysis, tail diagnostics, and lognormal calibration.
 - `requirements.txt` — Python dependencies.
 - `R-packages.txt` — R packages required for `paper_results.R`.
 
-
-The exploratory notebook used during development is intentionally not required for reproduction of the reported results.
-
 ## Simulation design
 
-The default configuration matches the manuscript:
+The default main simulation follows the revised manuscript:
 
-- 9 bipartite source-target configurations:
-  `(140,60), (130,70), ..., (60,140)`
-- quota values: `theta = 0.1, 0.2, ..., 1.0`
-- expected target degree: 20, implemented as `p = 20/M`
-- 1000 Monte Carlo replications
-- random seed: 42
-- Gaussian benchmark: Normal with `mu=100`, `sigma=20`, truncated at zero
-- Student-t: `df=3`, `loc=100`, `scale=20`, retaining positive draws
-- Pareto: scale 50 and tail parameters `alpha = 1.2, 1.5, 2.0, 3.0, 5.0`
+- Nine source–target configurations: `(140,60), (130,70), ..., (60,140)`.
+- Quota values: `theta = 0.1, 0.2, ..., 1.0`.
+- Expected target degree: 20, with independent edge probability `p = 20/M`, where `M` is the number of sources.
+- 1,000 Monte Carlo replications per configuration and quota value.
+- Default random seed: 42.
+- Gaussian benchmark: `N(100, 20^2)`, left-truncated at zero.
+- Student-t: `df = 3`, `loc = 100`, `scale = 20`, retaining positive draws.
+- Pareto: scale 50, with tail parameters `alpha = 1.2, 1.5, 2.0, 3.0, 5.0`.
+- BACI-calibrated lognormal: `sigma = 1.45`, with `mu = log(100) - sigma^2/2` so that the arithmetic mean weight is 100.
 
-Within each replication, the same bipartite topology is reused across all weight-generating regimes. This is the paired design used to isolate the effect of the weight distribution.
+Within each replication, all distributions share the same bipartite topology. The lognormal regime uses an independent random-number stream to avoid changing the legacy distributions' draws.
+
+The simulation reports edge-level and source-level Slack, aggregate pivotality among active sources, concentration measures, and topology diagnostics. Paired **directional proportions** describe how often a distribution is more fragile than the Gaussian benchmark; they are **not conventional p-values**.
 
 ## Python setup
 
-The simulations were developed for Python 3.12.12.
-
-Create and activate a virtual environment if desired, then install:
+The code was developed with Python 3.12.12. Install the dependencies from the repository root:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Run the simulation
-
-From the repository root:
+## Run the main simulation
 
 ```bash
 python simulation.py
 ```
 
-By default, outputs are saved in `results/`.
-
-The full paper run uses 1000 replications and can take substantial time. For a quick test:
+By default, this writes results to `results_REV1/`. The full run uses 1,000 replications and can be time-consuming. For a quick test:
 
 ```bash
-python simulation.py --replications 10
+python simulation.py --replications 10 --skip-figures
 ```
 
-Optional arguments:
+To specify the full settings explicitly:
 
 ```bash
-python simulation.py --output-dir results --replications 1000 --seed 42
+python simulation.py --output-dir results_REV1 --replications 1000 --seed 42
 ```
 
-Main outputs:
+Key outputs include:
 
-- `results/full_graphs_results_df.csv`
-- `results/full_mean_results.csv`
-- `results/full_mc_results_df.csv`
-- `results/figure3_mc_pvalue_surfaces_pivotal_fraction.png`
+- `results_REV1/full_graphs_results_df.csv` — replication-level metrics.
+- `results_REV1/full_mean_results.csv` — averages by distribution, topology, and quota.
+- `results_REV1/full_directional_results_df.csv` — paired directional comparisons.
+- `results_REV1/balanced_theta070_summary_REV1.csv` — balanced-scenario summary at `theta = 0.7`.
+- `results_REV1/theta070_across_scenarios_summary_REV1.csv` — summary across the nine scenarios.
+- `results_REV1/simulation_metadata_REV1.json` — simulation settings and calibration parameters.
 
-## Produce the paper simulation outputs in R
+The script also writes `full_mc_results_df.csv` for backward compatibility. **This file contains the same descriptive directional comparisons, not Monte Carlo p-values.** Figures are generated unless `--skip-figures` is used.
+
+## Produce the paper tables and figures in R
 
 Install the required R packages once:
 
 ```r
 install.packages(c(
-  "readr", "dplyr", "ggplot2",
-  "stringr", "knitr", "patchwork"
+  "readr", "dplyr", "ggplot2", "stringr",
+  "knitr", "patchwork", "ggrepel"
 ))
 ```
 
-Then run:
+After running the main Python simulation, execute:
 
 ```bash
-Rscript paper_results.R
+Rscript paper_results.R results_REV1
 ```
 
-or, if the simulation outputs are in another directory:
+The R script writes files to `results_REV1/paper_outputs_REV1/`, including:
+
+- Balanced-scenario summary and concentration diagnostics at `theta = 0.7`.
+- Distributional-sensitivity figures (Figure 2).
+- Paired directional-comparison table (Table 3).
+- Directional-proportion heatmaps (Figure 3).
+- Balanced-scenario quota-sensitivity and other robustness figures.
+
+The generated `README_REV1_outputs.txt` in that directory describes the individual output files.
+
+## B5: heterogeneous-topology robustness
+
+This separate experiment uses `(M,N) = (100,100)` and `theta = 0.7`. It compares the original Erdős–Rényi baseline with a heterogeneous target-degree design constructed from a **rescaled, bounded Zipf degree sequence** (`gamma = 3.5`). It includes Gaussian, Pareto `alpha = 1.5`, and BACI-calibrated lognormal weights.
+
+Run the main simulation first to produce the Erdős–Rényi baseline summary, then run:
 
 ```bash
-Rscript paper_results.R path/to/results
+python b5_topology_robustness.py --rev1-results-dir results_REV1
 ```
 
-The script creates `results/paper_outputs/`, including:
+The default output directory is `B5_topology_robustness/`. Main outputs include `B5_table_original_request.csv`, `B5_table_with_lognormal.csv`, `B5_topology_diagnostics.csv`, and replication-level results. Without the main simulation summary, the script still computes the heterogeneous-topology results but cannot include the Erdős–Rényi baseline row in its comparison table.
 
-- the balanced-scenario Monte Carlo summary (Table 2 in the manuscript),
-- the distributional-sensitivity figure at `theta = 0.7` (Figure 2),
-- the paired Monte Carlo summary at `theta = 0.7` (Table 3).
+For a quick test:
 
-## Empirical BACI analysis
+```bash
+python b5_topology_robustness.py --rev1-results-dir results_REV1 --replications 20 --output-dir B5_test
+```
 
-The empirical BACI trade-network analysis reported separately in the manuscript is **not included in this repository version**. The BACI data are publicly available from CEPII.
+## R3-C5: replication and seed sensitivity
 
-## Reproducibility note
+The separate stability check considers the balanced `(100,100)` configuration at `theta = 0.7`, with Gaussian, Pareto `alpha = 1.5`, and BACI-calibrated lognormal weights. It compares seeds 42 and 123 at `R = 250, 500, 1000`.
 
-The default seed is fixed at 42. For a fixed `(M,N)` configuration, the simulation restarts from the same seed for each quota value. Consequently, the underlying random sequences are aligned across quota values while the Slack threshold changes with `theta`.
+Keep this script beside `simulation.py`, then run:
+
+```bash
+python check_R3_C5_sensitivity.py
+```
+
+It creates `R3C5_seed_replication_sensitivity.csv` alongside the script. This is a targeted robustness check, **not** an exact rerun of the full eight-distribution random-number sequence used in the main simulation.
+
+## Empirical BACI 2023 analysis
+
+The cleaned notebook `BACI_slack_empirical_analysis_GitHub_clean.ipynb` covers the empirical component: construction of weighted trade networks by macro-sector, Slack and pivotality, sectoral tail diagnostics, summary tables, quota sensitivity, and calibration of the lognormal weight regime using observed target concentration.
+
+The BACI data are available from **CEPII** but are **not included** in this repository. The notebook is configured for **Google Colab** and expects the user to mount Google Drive, set `DATA_DIR`, and provide the BACI input files. Its current settings use HS17, BACI release `V202601`, and year 2023; the principal trade file is named `BACI_HS17_Y2023_V202601.csv`. Country and product code tables may also be supplied as configured in the notebook.
+
+Run the notebook cells in order. Its outputs are saved under `slack_empirical_outputs/` within `DATA_DIR`. The final lognormal calibration is carried out under the main simulation's expected target-degree topology (20), yielding the `sigma = 1.45` specification used by `simulation.py`.
+
+## Reproducibility notes
+
+For each fixed `(M,N)` configuration, the main simulation resets the same seed for each `theta`, aligning topology and weight realizations across quota values. Zero-degree sources are excluded from source-level Slack fractions and are reported separately. The robustness experiments have their own documented random-number settings.
+
+The main simulation and R post-processing can run from the repository code alone after dependencies are installed. The B5 comparison additionally needs the main simulation's baseline summary; the empirical notebook requires independently obtained BACI input files. Generated result files do not need to be committed to run these workflows.
