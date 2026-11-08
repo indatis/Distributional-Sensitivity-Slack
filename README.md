@@ -130,7 +130,7 @@ It creates `R3C5_seed_replication_sensitivity.csv` alongside the script. This is
 
 ## Empirical BACI 2023 analysis
 
-The cleaned notebook `BACI_slack_empirical_analysis_GitHub_clean.ipynb` covers the empirical component: construction of weighted trade networks by macro-sector, Slack and pivotality, sectoral tail diagnostics, summary tables, quota sensitivity, and calibration of the lognormal weight regime using observed target concentration.
+The cleaned notebook `BACI_slack_empirical_analysis.ipynb` covers the empirical component: construction of weighted trade networks by macro-sector, Slack and pivotality, sectoral tail diagnostics, summary tables, quota sensitivity, and calibration of the lognormal weight regime using observed target concentration.
 
 The BACI data are available from **CEPII** but are **not included** in this repository. The notebook is configured for **Google Colab** and expects the user to mount Google Drive, set `DATA_DIR`, and provide the BACI input files. Its current settings use HS17, BACI release `V202601`, and year 2023; the principal trade file is named `BACI_HS17_Y2023_V202601.csv`. Country and product code tables may also be supplied as configured in the notebook.
 
