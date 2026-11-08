@@ -12,7 +12,7 @@ This repository contains code for the revised Monte Carlo experiments, simulatio
 - `paper_results.R` — produces manuscript-facing tables and figures from the Python simulation outputs.
 - `b5_topology_robustness.py` — B5 robustness check with heterogeneous target degrees (Zipf exponent `gamma = 3.5`).
 - `check_R3_C5_sensitivity.py` — sensitivity check for replication counts and random seeds.
-- `BACI_slack_empirical_analysis_GitHub_clean.ipynb` — Google Colab notebook for the empirical BACI analysis, tail diagnostics, and lognormal calibration.
+- `BACI_slack_empirical_analysis.ipynb` — Google Colab notebook for the empirical BACI analysis, tail diagnostics, and lognormal calibration.
 - `requirements.txt` — Python dependencies.
 - `R-packages.txt` — R packages required for `paper_results.R`.
 
