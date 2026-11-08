@@ -11,7 +11,7 @@ This repository contains code for the revised Monte Carlo experiments, simulatio
 - `simulation.py` — main paired Monte Carlo simulation, including the BACI-calibrated lognormal regime and descriptive directional comparisons.
 - `paper_results.R` — produces manuscript-facing tables and figures from the Python simulation outputs.
 - `b5_topology_robustness.py` — B5 robustness check with heterogeneous target degrees (Zipf exponent `gamma = 3.5`).
-- `check_R3_C5_sensitivity.py` — sensitivity check for replication counts and random seeds.
+- `sensitivity_check.py` — sensitivity check for replication counts and random seeds.
 - `BACI_slack_empirical_analysis.ipynb` — Google Colab notebook for the empirical BACI analysis, tail diagnostics, and lognormal calibration.
 - `requirements.txt` — Python dependencies.
 - `R-packages.txt` — R packages required for `paper_results.R`.
@@ -123,7 +123,7 @@ The separate stability check considers the balanced `(100,100)` configuration at
 Keep this script beside `simulation.py`, then run:
 
 ```bash
-python check_R3_C5_sensitivity.py
+python sensitivity_check.py
 ```
 
 It creates `R3C5_seed_replication_sensitivity.csv` alongside the script. This is a targeted robustness check, **not** an exact rerun of the full eight-distribution random-number sequence used in the main simulation.
